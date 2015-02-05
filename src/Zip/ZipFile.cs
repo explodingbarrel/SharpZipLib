@@ -1636,8 +1636,10 @@ namespace ICSharpCode.SharpZipLib.Zip
 		/// </summary>
 		/// <param name="fileName">The name of the file to add.</param>
 		/// <param name="entryName">The name to use for the <see cref="ZipEntry"/> on the Zip file created.</param>
-		/// <exception cref="ArgumentNullException">Argument supplied is null.</exception>
-		public void Add(string fileName, string entryName)
+		/// <param name="compressionMethod">The compression method to use.</param>
+		/// <exception cref="ArgumentNullException">ZipFile has been closed.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">The compression method is not supported.</exception>
+		public void Add(string fileName, string entryName, CompressionMethod compressionMethod =CompressionMethod.Deflated)
 		{
 			if (fileName == null) {
 				throw new ArgumentNullException("fileName");
@@ -1646,9 +1648,15 @@ namespace ICSharpCode.SharpZipLib.Zip
 			if ( entryName == null ) {
 				throw new ArgumentNullException("entryName");
 			}
-			
+
+			if ( !ZipEntry.IsCompressionMethodSupported(compressionMethod) ) {
+				throw new ArgumentOutOfRangeException("compressionMethod");
+			}
+
 			CheckUpdating();
-			AddUpdate(new ZipUpdate(fileName, EntryFactory.MakeFileEntry(fileName, entryName, true)));
+			var entry = EntryFactory.MakeFileEntry (fileName, entryName, true);
+			entry.CompressionMethod = compressionMethod;
+			AddUpdate(new ZipUpdate(fileName, entry));
 		}
 
 
