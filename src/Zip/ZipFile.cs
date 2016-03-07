@@ -1019,8 +1019,9 @@ namespace ICSharpCode.SharpZipLib.Zip
 				bool testData = (tests & HeaderTest.Extract) != 0;
 
 				baseStream_.Seek(offsetOfFirstEntry + entry.Offset, SeekOrigin.Begin);
-				if ((int)ReadLEUint() != ZipConstants.LocalHeaderSignature) {
-					throw new ZipException(string.Format("Wrong local header signature @{0:X}", offsetOfFirstEntry + entry.Offset));
+                int value = (int)ReadLEUint();
+                if (value != ZipConstants.LocalHeaderSignature) {
+                    throw new ZipException(string.Format("Wrong local header signature [{1:X}] @{0:X}", offsetOfFirstEntry + entry.Offset, value));
 				}
 
 				short extractVersion = ( short ) (ReadLEUshort() & 0x00ff);
